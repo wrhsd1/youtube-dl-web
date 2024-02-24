@@ -1,0 +1,43 @@
+name: Build and publish Docker image1
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-and-push-x64-image:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Log in to Dockerhub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push Docker-nginx image
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          dockerfile: nginx/Dockerfile.nossl
+          platforms: linux/arm64, linux/amd64
+          push: true
+          tags: |
+            wrhsd/youtube-dl-web-nginx:latest
+
+      - name: Build and push Docker-server image
+        uses: docker/build-push-action@v4
+        with:
+          context: server
+          platforms: linux/arm64, linux/amd64
+          push: true
+          tags: |
+            wrhsd/youtube-dl-web-server:latest
