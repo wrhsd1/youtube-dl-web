@@ -24,10 +24,12 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Make frontend build script executable
-        run: chmod +x frontend/build.sh
-        
+        run: chmod +x ./build.sh
+        working-directory: ./frontend
+       
       - name: Run frontend build script
-        run: frontend/build.sh
+        run: ./build.sh
+        working-directory: ./frontend
 
       - name: Build and push Docker-nginx image
         uses: docker/build-push-action@v4
